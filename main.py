@@ -1,6 +1,6 @@
 import os
 import assemblyai as aai
-from packages.elevenlabs_tts import speak  # Update the class name if different
+from packages.elevenlabs_tts import speak_stream 
 from packages.sales_chatbot import SalesChatbot
 
 from dotenv import load_dotenv
@@ -17,11 +17,13 @@ class VoiceBot:
     def start_transcription(self):
         self.transcriber = aai.RealtimeTranscriber(
             sample_rate = 16000,
-            on_data = self.on_data,
+            on_data =  self.on_data,
             on_error = self.on_error,
             on_open = self.on_open,
             on_close = self.on_close,
-            end_utterance_silence_threshold = 500
+            end_utterance_silence_threshold = 500,
+            disable_partial_transcripts=True
+            #https://www.assemblyai.com/docs/speech-to-text/streaming#disable-partial-transcripts 
         )
 
         self.transcriber.connect()
@@ -43,8 +45,9 @@ class VoiceBot:
             return
 
         if isinstance(transcript, aai.RealtimeFinalTranscript):
-            print("[User]: " + transcript.text, end="\n")
+            print("[User]: " + transcript.text, end="\n")    
             self.respond(transcript.text)
+
         else:
             print("[User]: " + transcript.text, end="\r")
 
@@ -55,18 +58,12 @@ class VoiceBot:
     def on_close(self):
         return
     
-    def respond(self, transcript):
+    def respond(self, transcript): 
 
-        self.stop_transcription()
+        self.stop_transcription() 
 
-        # generate response from OpenAI
-        response = self.chatbot.generate_response(transcript)
+        speak_stream(transcript, self.chatbot.generate_response_stream)
 
-        print("[Bot]: ", response)
-
-        # speak response using ElevenLabs
-        speak(response)
-        
         self.start_transcription()
 
 voice_bot = VoiceBot()
