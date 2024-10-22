@@ -72,6 +72,5 @@ https://www.loom.com/share/f6d4771bba3640a3b5121684a358ac4d
 
 Main changes to improve latency comes from: 
 
-- Removing partial transcriptions from the transcriptions. The program only utilizes the final transcription from the user so removing the partial transcriptions improves latency  (however it does remove the realtime printing of user speach.) Now requests are sent to the transcriber if the transcription is complete, removing uneccissary communication between AssemblyAI's APIs
-
+- Removing partial transcriptions from the transcriptions. The program only utilizes the final transcription from the user so removing the partial transcriptions improves latency (however it does remove the realtime printing of user speach) Now requests are sent to the transcriber only if the transcription is complete, removing uneccissary communication with the AssemblyAI's API
 -Adding Streaming to both text generation and TTS. Original code works sequentially of waiting for text generation to complete, then passing the entire completed text to the TTS service and playing the entirety of the message. Changes now makes the process a stream. As new text is created, it is streamed directly to the TTS service and played back to the user. This decreases latency by allowing TTS to start processing data before the end of generation. 
